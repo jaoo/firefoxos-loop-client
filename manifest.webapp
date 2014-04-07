@@ -18,7 +18,9 @@
     }
   },
   "permissions": {
-    "push":{}
+    "push":{},
+    "audio-capture": {},
+    "video-capture": {}
   },
   "messages": [
      { "push": "/index.html" }
