@@ -3,15 +3,35 @@
 
 'use strict';
 
+/* global Controller */
+
+/* exported UI */
+
 /*
  * This code is in charge of the UI & User actions in our app.
  * This is the 'View' part of our MVC.
  */
 
 (function (exports) {
+  var UI = {
+    init: function ui_init() {
+      // Retrieve the various page elements
+      var shareUrlButton = document.getElementById('share');
 
-  var UI = {};
+      shareUrlButton.addEventListener('click', this.onShareUrl);
+    },
+
+    onShareUrl: function ui_onShareUrl() {
+      Controller.shareUrl('DummyId',
+        function onSuccess() {
+          window.close();
+        },
+        function onError(e) {
+          alert(e.msg)
+          window.close();
+        });
+    }
+  };
 
   exports.UI = UI;
-
 }(this));
