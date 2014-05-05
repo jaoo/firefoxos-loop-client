@@ -22,24 +22,5 @@
 window.addEventListener('localized', function onLocalized() {
   window.removeEventListener('localized', onLocalized);
 
-  // TODO: This piece of code will be removed eventually. Temporary start up.
-  SimplePush.createChannel(
-   'loop',
-   function onNotification(version) {
-   },
-   function onRegistered(error, endpoint) {
-     if (error) {
-       alert('Could not get simple push url.');
-       window.close();
-     }
-     SimplePush.start();
-     ClientRequestHelper.register(endpoint,
-       function onRegisterSuccess() {
-         UI.init();
-       },
-       function onRegisterError() {
-         alert('Could not register the peer.');
-         window.close();
-       });
-   });
+  UI.init();
 });

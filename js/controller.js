@@ -1,7 +1,7 @@
 /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 
-/* global CallHelper */
+/* global CallHelper, AccountHelper */
 
 /* exported Controller */
 
@@ -21,6 +21,43 @@
   }
 
   var Controller = {
+    /**
+     * Get the app account.
+     *
+     * @param {Function} onsuccess Function to be called once it gets the
+     *                             account. The account object is passed as
+     *                             parameter.
+     * @param {Function} onerror Function to be called in case of any error. An
+     *                           error object is passed as parameter.
+     */
+    getAccount: function c_getAccount(onsuccess, onerror) {
+      AccountHelper.getAccount(onsuccess, onerror);
+    },
+
+    /**
+     * Sign up the user.
+     *
+     * @param {Function} onsuccess Function to be called once the user gets
+     *                             signed up.
+     * @param {Function} onerror Function to be called in case of any error. An
+     *                           error object is passed as parameter.
+     */
+    signUp: function signUp(id, onsuccess, onerror) {
+      AccountHelper.signUp(id, onsuccess, onerror);
+    },
+
+    /**
+     * Sign in the user.
+     *
+     * @param {Function} onsuccess Function to be called once the user gets
+     *                             signed in.
+     * @param {Function} onerror Function to be called in case of any error. An
+     *                           error object is passed as parameter.
+     */
+    signIn: function signIn(onsuccess, onerror) {
+      AccountHelper.signIn(onsuccess, onerror);
+    },
+
     /**
      * Share the call url with called party.
      *
@@ -48,6 +85,13 @@
           };
        },
        onerror);
+    },
+
+    /**
+     * Log the user out. It clears the app account.
+     */
+    logOut: function logOut() {
+      AccountHelper.logOut();
     }
   };
 
