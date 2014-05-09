@@ -23,6 +23,16 @@
   "messages": [
      { "push": "/index.html" }
   ],
+  "activities": {
+    "view": {
+      "filters": {
+        "type": "url",
+        "url": {
+          "required":true, "pattern":"https?:\/\/loop.dev.mozaws.net\/calls\/.{1,16384}"
+        }
+      }
+   }
+  },
   "default_locale": "en",
   "fullscreen": "true",
   "orientation": "portrait",
