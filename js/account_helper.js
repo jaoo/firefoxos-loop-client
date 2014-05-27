@@ -14,7 +14,7 @@
     }
   }
 
-  var ID_KEY = 'loop';
+  var ACCOUNT_KEY = 'loop';
 
   var AccountStorage = {
     /**
@@ -26,13 +26,14 @@
      */
     load: function a_load(onsuccess, onerror) {
       asyncStorage.getItem(
-        ID_KEY,
-        function onId(id) {
-          if (!id) {
+        ACCOUNT_KEY,
+        function onAccount(account) {
+          if (!account) {
             _callback(onsuccess, [null]);
             return;
           }
-          _callback(onsuccess, [new Account(id.value)]);
+          _callback(onsuccess,
+                    [new Account(account.id.value, account.credentials)]);
       });
     },
 
@@ -42,15 +43,17 @@
      * @param {Account} account Account object to store.
      */
     store: function a_store(account) {
-      asyncStorage.setItem(ID_KEY, account.id);
+      asyncStorage.setItem(
+        ACCOUNT_KEY, {id: account.id, credentials: account.credentials}
+      );
     },
 
     /**
      * Clear the account storage.
      *
      */
-    clear: function a_clear(identifier) {
-      asyncStorage.setItem(ID_KEY, null);
+    clear: function a_clear() {
+      asyncStorage.setItem(ACCOUNT_KEY, null);
     }
   };
 
@@ -90,11 +93,16 @@
            _callback(onerror, [new Error('Invalid endpoint')]);
          }
          // Register the peer.
-         ClientRequestHelper.register(endpoint,
-           function onRegisterSuccess() {
+         ClientRequestHelper.register(
+           null, // credentials
+           endpoint,
+           function onRegisterSuccess(result, sessionToken) {
+             Utils.log('AccountHelper.signUp() sessionToken is ' + sessionToken);
              // Create an account locally.
              try {
-               AccountStorage.store(new Account(id));
+               AccountStorage.store(
+                 new Account(id, {type: 'Hawk', value: sessionToken})
+               );
                SimplePush.start();
                _callback(onsuccess);
              } catch(e) {
@@ -132,7 +140,9 @@
            if (!endpoint) {
              _callback(onerror, [new Error('Invalid endpoint')]);
            }
-           ClientRequestHelper.register(endpoint,
+           ClientRequestHelper.register(
+             account.credentials,
+             endpoint,
              function onRegisterSuccess() {
                SimplePush.start();
                _callback(onsuccess);
