@@ -64,7 +64,7 @@
       };
 
       var onSignUpError = function(e) {
-        alert(e.message);
+        alert(e);
       };
 
       this.signUpButton.hidden = false;
@@ -96,7 +96,7 @@
       };
 
       var onSignInError = function(e) {
-        alert(e.message);
+        alert(e);
       };
 
       _callback(onsignin, [onSignInSuccess.bind(UI), onSignInError]);
