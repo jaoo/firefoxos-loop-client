@@ -21,14 +21,21 @@
     req.setRequestHeader('Content-Type', 'application/json');
     req.responseType = 'json';
     req.timeout = TIMEOUT;
-    req.withCredentials = true;
 
+    if (options.credentials) {
+      var hawkHeader = hawk.client.header(options.url, options.method, {
+        credentials: options.credentials
+      });
+      req.setRequestHeader('authorization', hawkHeader.field);
+    }
     req.onload = function() {
       if (req.status !== 200 && req.status !== 302) {
         _callback(onerror, [req.response]);
         return;
       }
-      _callback(onsuccess, [req.response]);
+      _callback(
+        onsuccess, [req.response, req.getResponseHeader('Hawk-Session-Token')]
+      );
     };
 
     req.onerror = req.ontimeout = function(event) {
@@ -43,6 +50,9 @@
     req.send(body);
   }
 
+  /** Token for HTTP authenticated requests. */
+  var _sessionToken = null;
+
   var ClientRequestHelper = {
     get serverUrl() {
       return SERVER_URL;
@@ -50,22 +60,43 @@
 
     register: function register(pushEndpoint, onsuccess, onerror) {
       _request({
-        method: 'POST',
-        url: SERVER_URL + '/registration',
-        body: {
-          simple_push_url: pushEndpoint
-        }
-      }, onsuccess, onerror);
+          method: 'POST',
+          url: SERVER_URL + '/registration',
+          body: {
+            simple_push_url: pushEndpoint
+          }
+        },
+        function onSuccess(result, sessionToken) {
+          if (!sessionToken) {
+            _callback(onerror, [new Error('No session token')]);
+            return;
+          }
+          _sessionToken = sessionToken;
+          _callback(onsuccess, [result]);
+        },
+        onerror);
     },
 
     generateCallUrl: function generateCallUrl(callerId, onsuccess, onerror) {
-      _request({
-        method: 'POST',
-        url: SERVER_URL + '/call-url',
-        body: {
-          callerId: callerId
+      if (!_sessionToken) {
+        _callback(onerror, [new Error('No session token')]);
+        return;
+      }
+      deriveHawkCredentials(_sessionToken, 'sessionToken', 2 * 32,
+        function(hawkCredentials) {
+          _request({
+              method: 'POST',
+              url: SERVER_URL + '/call-url',
+              body: {
+               callerId: callerId
+              },
+              credentials: hawkCredentials
+            },
+            onsuccess,
+            onerror
+          );
         }
-      }, onsuccess, onerror);
+      );
     },
 
     getCallUrl: function getCallUrl(token, onsuccess, onerror) {
@@ -83,17 +114,41 @@
     },
 
     deleteCall: function deleteCall(token, onsuccess, onerror) {
-      _request({
-        method: 'DELETE',
-        url: SERVER_URL + '/calls/' + token
-      }, onsuccess, onerror);
+      if (!_sessionToken) {
+        _callback(onerror, [new Error('No session token')]);
+        return;
+      }
+      deriveHawkCredentials(_sessionToken, 'sessionToken', 2 * 32,
+        function(hawkCredentials) {
+          _request({
+              method: 'DELETE',
+              url: SERVER_URL + '/calls/' + token,
+              credentials: hawkCredentials
+            },
+            onsuccess,
+            onerror
+          );
+        }
+      );
     },
 
     getCalls: function getCalls(version, onsuccess, onerror) {
-      _request({
-        method: 'GET',
-        url: SERVER_URL + '/calls?version=' + version
-      }, onsuccess, onerror);
+      if (!_sessionToken) {
+        _callback(onerror, [new Error('No session token')]);
+        return;
+      }
+      deriveHawkCredentials(_sessionToken, 'sessionToken', 2 * 32,
+        function(hawkCredentials) {
+          _request({
+              method: 'GET',
+              url: SERVER_URL + '/calls?version=' + version,
+              credentials: hawkCredentials
+            },
+            onsuccess,
+            onerror
+          );
+        }
+      );
     },
 
     getCall: function getCall(callId, onsuccess, onerror) {
