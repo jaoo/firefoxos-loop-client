@@ -22,9 +22,15 @@
     req.responseType = 'json';
     req.timeout = TIMEOUT;
 
-    if (options.credentials) {
+    if (options.credentials && options.credentials.assertion) {
+      req.setRequestHeader(
+        'authorization',
+        options.credentials.type + ' ' + options.credentials.assertion
+      );
+    }
+    if (options.credentials && options.credentials.hawk) {
       var hawkHeader = hawk.client.header(options.url, options.method, {
-        credentials: options.credentials
+        credentials: options.credentials.hawk
       });
       req.setRequestHeader('authorization', hawkHeader.field);
     }
@@ -58,10 +64,12 @@
       return SERVER_URL;
     },
 
-    register: function register(pushEndpoint, onsuccess, onerror) {
+    register: function register(credentials, pushEndpoint, onsuccess, onerror) {
       _request({
           method: 'POST',
           url: SERVER_URL + '/registration',
+          // TODO: Send Fx account assertions once bug 1019564 get fixed.
+          // credentials: credentials,
           body: {
             simple_push_url: pushEndpoint
           }
@@ -72,7 +80,7 @@
             return;
           }
           _sessionToken = sessionToken;
-          _callback(onsuccess, [result]);
+          _callback(onsuccess, [_sessionToken]);
         },
         onerror);
     },
@@ -90,7 +98,7 @@
               body: {
                callerId: callerId
               },
-              credentials: hawkCredentials
+              credentials: {hawk: hawkCredentials}
             },
             onsuccess,
             onerror
@@ -123,7 +131,7 @@
           _request({
               method: 'DELETE',
               url: SERVER_URL + '/calls/' + token,
-              credentials: hawkCredentials
+              credentials: {hawk: hawkCredentials}
             },
             onsuccess,
             onerror
@@ -142,7 +150,7 @@
           _request({
               method: 'GET',
               url: SERVER_URL + '/calls?version=' + version,
-              credentials: hawkCredentials
+              credentials: {hawk: hawkCredentials}
             },
             onsuccess,
             onerror

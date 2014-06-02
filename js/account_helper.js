@@ -14,7 +14,7 @@
     }
   }
 
-  var ID_KEY = 'loop';
+  var ACCOUNT_KEY = 'loop';
 
   var AccountStorage = {
     /**
@@ -26,13 +26,15 @@
      */
     load: function a_load(onsuccess, onerror) {
       asyncStorage.getItem(
-        ID_KEY,
-        function onId(id) {
-          if (!id) {
+        ACCOUNT_KEY,
+        function onAccount(account) {
+          if (!account) {
             _callback(onsuccess, [null]);
             return;
           }
-          _callback(onsuccess, [new Account(id.value)]);
+          _callback(
+            onsuccess, [new Account(account.id.value, account.assertion)]
+          );
       });
     },
 
@@ -42,15 +44,17 @@
      * @param {Account} account Account object to store.
      */
     store: function a_store(account) {
-      asyncStorage.setItem(ID_KEY, account.id);
+      asyncStorage.setItem(
+        ACCOUNT_KEY, {id: account.id, assertion: account.assertion}
+      );
     },
 
     /**
      * Clear the account storage.
      *
      */
-    clear: function a_clear(identifier) {
-      asyncStorage.setItem(ID_KEY, null);
+    clear: function a_clear() {
+      asyncStorage.setItem(ACCOUNT_KEY, null);
     }
   };
 
@@ -71,6 +75,8 @@
     /**
      * Sign up the user.
      *
+     * @param {String} credentials Assertion to sign up the user with. It could
+     *                             be either a MSISDN or a Fx Account assertion.
      * @param {Function} onsuccess Function to be called once the user gets
      *                             signed up.
      * @param {Function} onerror Function to be called in case of any error. An
@@ -78,7 +84,24 @@
      * @param {Function} onnotification Function to be called once the device
      *                                  receives a simple push notification.
      */
-    signUp: function signUp(id, onsuccess, onerror, onnotification) {
+    signUp: function signUp(assertion, onsuccess, onerror, onnotification) {
+      /**
+       * Helper function. Return the identifier in the assertion.
+       *
+       * @param {Object} assertion Assertion object.
+       *
+       * @return {String} The indetifier in the assertion.
+       */
+      function _getIdentifier(assertion) {
+        if (assertion && assertion.type === 'BrowserID') {
+          var unpacked = Utils.unpackAssertion(assertion.assertion);
+          return JSON.parse(unpacked.claim)['fxa-verifiedEmail'];
+        }
+        // TODO: Get MSISDN in case of MSISDN assertion.
+
+        return null;
+      }
+
       SimplePush.createChannel(
        'loop',
        onnotification,
@@ -90,11 +113,15 @@
            _callback(onerror, [new Error('Invalid endpoint')]);
          }
          // Register the peer.
-         ClientRequestHelper.register(endpoint,
-           function onRegisterSuccess() {
+         ClientRequestHelper.register(
+           assertion,
+           endpoint,
+           function onRegisterSuccess(token) {
              // Create an account locally.
              try {
-               AccountStorage.store(new Account(id));
+               AccountStorage.store(
+                 new Account(_getIdentifier(assertion), assertion)
+               );
                SimplePush.start();
                _callback(onsuccess);
              } catch(e) {
@@ -132,7 +159,9 @@
            if (!endpoint) {
              _callback(onerror, [new Error('Invalid endpoint')]);
            }
-           ClientRequestHelper.register(endpoint,
+           ClientRequestHelper.register(
+             account.assertion,
+             endpoint,
              function onRegisterSuccess() {
                SimplePush.start();
                _callback(onsuccess);
@@ -151,9 +180,13 @@
         if (!account) {
           return;
         }
+        var msisdnSignUp = true;
+        if (account.assertion.type === 'BrowserID') {
+          msisdnSignUp = false;
+        }
         AccountStorage.clear();
         // TODO We should remove the endpoint from the server as well.
-        _callback(onlogout);
+        _callback(onlogout, [msisdnSignUp]);
       });
     }
   };

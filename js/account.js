@@ -30,12 +30,15 @@
 
   /** Peer's id object (value and type) for the current account. */
   var _id = null;
+  /** */
+  var _assertion = null;
 
   /**
    * Represents a parsed Account object.
    */
-  function Account(identifier) {
+  function Account(identifier, assertion) {
     _id = _parse(identifier);
+    _assertion = assertion;
   }
 
   Account.prototype = {
@@ -51,6 +54,13 @@
      */
     get id() {
       return _id;
+    },
+
+    /**
+     *
+     */
+    get assertion() {
+      return _assertion;
     }
   };
 

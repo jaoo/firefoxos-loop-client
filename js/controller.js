@@ -1,7 +1,7 @@
 /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 
-/* global UI, CallHelper, AccountHelper */
+/* global UI, CallHelper, AccountHelper, FxacHelper */
 
 /* exported Controller */
 
@@ -74,20 +74,45 @@
     /**
      * Sign up the user.
      *
+     * @param {Bool} msisdnSignUp Flag to determine whether the user performs
+     *                            the sign up process with a MSISDN assertion.
+     *                            If false, the user performs the sign up
+     *                            process with a Fx Account assertion.
      * @param {Function} onsuccess Function to be called once the user gets
      *                             signed up.
      * @param {Function} onerror Function to be called in case of any error. An
      *                           error object is passed as parameter.
      */
-    signUp: function signUp(id, onsuccess, onerror) {
+    signUp: function signUp(msisdnSignUp, onsuccess, onerror) {
       var onSuccess = function() {
         UI.shareUrl(this.shareUrl);
         UI.logOut(this.logOut);
         _callback(onsuccess);
       };
-      AccountHelper.signUp(
-        id, onSuccess.bind(Controller), onerror, _onNotification
-      );
+
+      var onLogin = function(assertion) {
+        var credentials = {};
+        if (msisdnSignUp) {
+          credentials.type = '';
+        } else {
+          credentials.type = 'BrowserID';
+        }
+        credentials.assertion = assertion;
+
+        AccountHelper.signUp(
+          credentials, onSuccess.bind(Controller), onerror, _onNotification
+        );
+      };
+
+      if (!msisdnSignUp) {
+        FxacHelper.init(onLogin);
+        FxacHelper.register();
+      } else {
+        // TODO: Request the MSISD assertion and start the registation dance.
+        _callback(
+          onerror, [new Error('Cannot register user through MSISDN yet.')]
+        );
+      }
     },
 
     /**
@@ -144,7 +169,13 @@
      *                            gets completed.
      */
     logOut: function logOut(onlogout) {
-      AccountHelper.logOut(onlogout);
+      AccountHelper.logOut(function (msisdnSignUp) {
+        if (msisdnSignUp) {
+        } else {
+          FxacHelper.logout();
+        }
+        _callback(onlogout);
+      });
     }
   };
 
