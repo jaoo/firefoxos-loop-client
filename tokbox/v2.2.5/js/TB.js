@@ -21,8 +21,8 @@
     // The URL of the tokbox website
     websiteURL: 'http://www.tokbox.com',
 
-    // The URL of the CDN
-    cdnURL: 'http://static.opentok.com',
+    // The URL of the CDN when runnint on top of running FxOS
+    cdnURL: '',
     // The URL to use for logging
     loggingURL: 'http://hlg.tokbox.com/prod',
     // The anvil API URL
@@ -35,8 +35,8 @@
 
     // If this environment supports SSL
     supportSSL: 'true',
-    // The CDN to use if we're using SSL
-    cdnURLSSL: 'https://static.opentok.com',
+    // The CDN to use if we're using SSL when runnint on top of running FxOS
+    cdnURLSSL: '',
     // The loggging URL to use if we're using SSL
     loggingURLSSL: 'https://hlg.tokbox.com/prod',
     // The anvil API URL to use if we're using SSL
@@ -3015,10 +3015,10 @@ OTHelpers.centerElement = function(element, width, height) {
 
     if (props.supportSSL && (window.location.protocol.indexOf('https') >= 0 ||
       window.location.protocol.indexOf('chrome-extension') >= 0)) {
-      props.assetURL = props.cdnURLSSL + '/webrtc/' + props.version;
+      props.assetURL = props.cdnURLSSL + '/tokbox/' + props.version;
       props.loggingURL = props.loggingURLSSL;
     } else {
-      props.assetURL = props.cdnURL + '/webrtc/' + props.version;
+      props.assetURL = props.cdnURL + '/tokbox/' + props.version;
     }
 
     props.configURL = props.assetURL + '/js/dynamic_config.min.js';
@@ -4211,6 +4211,9 @@ OTHelpers.centerElement = function(element, width, height) {
     var videoElement = document.createElement('video');
     videoElement.setAttribute('autoplay', '');
     videoElement.innerHTML = fallbackText;
+
+    // XXX: Route audio through the Telephony channel for FxOS.
+    videoElement.mozAudioChannelType = 'telephony';
 
     if (attributes) {
       if (attributes.muted === true) {
