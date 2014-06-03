@@ -1,7 +1,7 @@
 /* -*- Mode: js; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- /
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 
-/* global ClientRequestHelper */
+/* global ClientRequestHelper, Opentok */
 
 /* exported CallHelper */
 
@@ -26,7 +26,7 @@
    * @param {Function} onerror Function to be called if any error happens.
    */
   function _joinCall(call, target, onconnected, onstream, onerror) {
-
+    Opentok.setConstraints({audio: true, video: true});
     var session = TB.initSession(call.apiKey, call.sessionId);
     session.on({
       streamCreated: function(event) {
