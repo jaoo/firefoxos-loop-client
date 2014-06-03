@@ -14628,7 +14628,8 @@ OTHelpers.centerElement = function(element, width, height) {
           onStreamAvailableError.bind(this),
           onAccessDialogOpened.bind(this),
           onAccessDialogClosed.bind(this),
-          onAccessDenied.bind(this)
+          onAccessDenied.bind(this),
+          OT.$.customGetUserMedia
         );
       }, this);
 
