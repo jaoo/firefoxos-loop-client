@@ -36,7 +36,7 @@
     }
     req.onload = function() {
       if (req.status !== 200 && req.status !== 302) {
-        _callback(onerror, [req.response]);
+        _callback(onerror, [req.statusText]);
         return;
       }
       _callback(
@@ -68,8 +68,7 @@
       _request({
           method: 'POST',
           url: SERVER_URL + '/registration',
-          // TODO: Send Fx account assertions once bug 1019564 get fixed.
-          // credentials: credentials,
+          credentials: credentials,
           body: {
             simple_push_url: pushEndpoint
           }

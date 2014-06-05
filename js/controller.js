@@ -85,12 +85,13 @@
      */
     signUp: function signUp(msisdnSignUp, onsuccess, onerror) {
       var onSuccess = function() {
-        UI.shareUrl(this.shareUrl);
+        // UI.shareUrl(this.shareUrl);
         UI.logOut(this.logOut);
         _callback(onsuccess);
       };
 
       var onLogin = function(assertion) {
+        FxacHelper.logout();
         var credentials = {};
         if (msisdnSignUp) {
           credentials.type = '';
@@ -169,13 +170,14 @@
      *                            gets completed.
      */
     logOut: function logOut(onlogout) {
-      AccountHelper.logOut(function (msisdnSignUp) {
-        if (msisdnSignUp) {
-        } else {
-          FxacHelper.logout();
-        }
-        _callback(onlogout);
-      });
+      window.close();
+      // AccountHelper.logOut(function (msisdnSignUp) {
+      //   if (msisdnSignUp) {
+      //   } else {
+      //     FxacHelper.logout();
+      //   }
+      //   _callback(onlogout);
+      // });
     }
   };
 

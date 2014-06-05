@@ -119,10 +119,10 @@
            function onRegisterSuccess(token) {
              // Create an account locally.
              try {
-               AccountStorage.store(
-                 new Account(_getIdentifier(assertion), assertion)
-               );
-               SimplePush.start();
+               // AccountStorage.store(
+               //   new Account(_getIdentifier(assertion), assertion)
+               // );
+               // SimplePush.start();
                _callback(onsuccess);
              } catch(e) {
                _callback(onerror, [e]);

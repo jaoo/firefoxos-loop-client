@@ -64,7 +64,8 @@
       };
 
       var onSignUpError = function(e) {
-        alert(e.message);
+        alert('Oh, something bad happened: ' + e);
+        window.close();
       };
 
       this.signUpButton.hidden = false;
