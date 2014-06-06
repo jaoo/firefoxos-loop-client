@@ -28,6 +28,7 @@
     if (options.credentials) {
       switch (options.credentials.type) {
         case 'Hawk':
+        case 'BrowserID':
           authorization =
             options.credentials.type + ' ' + options.credentials.value;
           break;
@@ -80,6 +81,7 @@
           },
           // TODO: Pass in the credentials object once the register proccess
           // doesn't fail when sending Hawk authorization headers.
+          // TODO: Send Fx account assertions once bug 1019564 get fixed.
           credentials: null
         },
         function onSuccess(result, sessionToken) {

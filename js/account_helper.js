@@ -74,6 +74,8 @@
     /**
      * Sign up the user.
      *
+     * @param {Object} credentials Assertion to sign up the user with. It could
+     *                             be either a MSISDN or a Fx Account assertion.
      * @param {Function} onsuccess Function to be called once the user gets
      *                             signed up.
      * @param {Function} onerror Function to be called in case of any error. An
@@ -81,7 +83,24 @@
      * @param {Function} onnotification Function to be called once the device
      *                                  receives a simple push notification.
      */
-    signUp: function signUp(id, onsuccess, onerror, onnotification) {
+    signUp: function signUp(credentials, onsuccess, onerror, onnotification) {
+      /**
+       * Helper function. Return the identifier in the assertion.
+       *
+       * @param {Object} assertion Assertion object.
+       *
+       * @return {String} The indetifier in the assertion.
+       */
+      function _getIdentifier(assertion) {
+        if (assertion && assertion.type === 'BrowserID') {
+          var unpacked = Utils.unpackAssertion(assertion.assertion);
+          return JSON.parse(unpacked.claim)['fxa-verifiedEmail'];
+        }
+        // TODO: Get MSISDN in case of MSISDN assertion.
+
+        return null;
+      }
+
       SimplePush.createChannel(
        'loop',
        onnotification,
@@ -101,7 +120,8 @@
              // Create an account locally.
              try {
                AccountStorage.store(
-                 new Account(id, {type: 'Hawk', value: sessionToken})
+                 new Account(_getIdentifier(credentials.value),
+                             {type: 'Hawk', value: sessionToken})
                );
                SimplePush.start();
                _callback(onsuccess);
