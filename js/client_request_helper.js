@@ -1,12 +1,14 @@
 /* -*- Mode: js; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- /
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 
+/* exported ClientRequestHelper */
+
+/* globals Config */
+
 'use strict';
 
 (function(exports) {
-  // TODO Poing to the right server and retrieve this info
-  // from a 'config' file
-  var SERVER_URL = 'http://loop.dev.mozaws.net';
+  var SERVER_URL = Config.server_url;
   var TIMEOUT = 15000;
 
   function _callback(cb, args) {
