@@ -26,7 +26,11 @@
    * @param {Function} onerror Function to be called if any error happens.
    */
   function _joinCall(call, target, onconnected, onstream, onerror) {
-    Opentok.setConstraints({audio: true, video: true});
+    var constraints = {
+      audio: true,
+      video: {facingMode: 'environment', require:['facingMode']}
+    };
+    Opentok.setConstraints(constraints);
     var session = TB.initSession(call.apiKey, call.sessionId);
     session.on({
       streamCreated: function(event) {
