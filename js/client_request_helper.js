@@ -79,24 +79,14 @@
           body: {
             simple_push_url: pushEndpoint
           },
-          // TODO: Pass in the credentials object once the register proccess
-          // doesn't fail when sending Hawk authorization headers.
-          // TODO: Send Fx account assertions once bug 1019564 get fixed.
-          credentials: null
+          credentials: credentials
         },
         function onSuccess(result, sessionToken) {
           if (!sessionToken) {
             _callback(onerror, [new Error('No session token')]);
             return;
           }
-          // TODO: Save the hawk token that way until the register proccess
-          // doesn't fail when sending Hawk authorization headers.
-          if (credentials) {
-            _sessionToken = credentials.value;
-          } else {
-            _sessionToken = sessionToken;
-          }
-          _callback(onsuccess, [result, _sessionToken]);
+          _callback(onsuccess, [result, sessionToken]);
         },
         onerror);
     },

@@ -113,7 +113,7 @@
          }
          // Register the peer.
          ClientRequestHelper.register(
-           null, // credentials
+           credentials,
            endpoint,
            function onRegisterSuccess(result, sessionToken) {
              Utils.log('AccountHelper.signUp() sessionToken is ' + sessionToken);
