@@ -18,7 +18,7 @@
   }
 
   function _request(options, onsuccess, onerror) {
-    var req = new XMLHttpRequest();
+    var req = new XMLHttpRequest({mozSystem: true});
     req.open(options.method, options.url, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.responseType = 'json';
@@ -43,7 +43,7 @@
     }
     req.onload = function() {
       if (req.status !== 200 && req.status !== 302) {
-        _callback(onerror, [req.status]);
+        _callback(onerror, [req.statusText]);
         return;
       }
       _callback(

@@ -18,6 +18,7 @@
     }
   },
   "permissions": {
+    "systemXHR":{},
     "push":{},
     "video-capture": {},
     "audio-capture": {},
