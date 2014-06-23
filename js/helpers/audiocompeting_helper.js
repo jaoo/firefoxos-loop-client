@@ -22,7 +22,7 @@
 
   /**
    * Fire the given event on the audio competing helper.
-   * 
+   *
    * @param {String} type A string representing the event type being fired.
    */
   function _fireEvent(type) {
@@ -34,6 +34,7 @@
     for (var i = 0; i <_listeners[type].length; i++) {
       if(_listeners[type][i] && (typeof _listeners[type][i] === 'function')) {
         _listeners[type][i].call(null);
+        console.log('AudioCompetingHelper(' + _appName+ ') calls ' + _listeners[type][i]);
       }
     }
   }
@@ -75,9 +76,9 @@
       if (!_silenceBufferSource) {
         return;
       }
-      _silenceBufferSource.start(0);
-      // window.setTimeout(function () {
-      // }, 3000);
+      window.setTimeout(function () {
+        _silenceBufferSource.start(0);
+      }, 3000);
     },
 
     /**
@@ -94,17 +95,17 @@
 
     /**
      * Register the specified listener on the audio competing helper.
-     * 
+     *
      * @param {String} type A string representing the event type to listen for.
      * @param {Function} listener The function that receives a notification when
      *                            an event of the specified type occurs.
      */
-    addEventListener: function ach_addEventListener(type, listener) {
+    addListener: function ach_addEventListener(type, listener) {
       if ((type !== 'mozinterruptbegin') && (type !== 'mozinterruptend') ) {
         // TODO: Should we throw an exception?
         return;
       }
-      if (listener && (typeof listener !== 'function')) { 
+      if (listener && (typeof listener !== 'function')) {
         // TODO: Should we throw an exception?
        return;
       }
@@ -112,15 +113,20 @@
     },
 
     /**
-     * Remove the event listener previously registered with
+     * Clear the event listeners previously registered with
      * AudioCompetingHelper.addEventListener.
-     * 
+     *
      * @param {String} type A string representing the event type being removed.
-     * @param {Function} listene The listener parameter indicates the event 
-     *                           listener function to be removed.
      */
-    removeEventListener: function ach_removeEventListener(type, listener) {
-      // TODO
+    clearListeners: function ach_clearListeners(type) {
+      if (type) {
+        _listeners[type] = [];
+        return;
+      }
+      _listeners = {
+        mozinterruptbegin: [],
+        mozinterruptend: []
+      };
     }
   };
 
