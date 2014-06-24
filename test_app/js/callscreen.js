@@ -11,18 +11,19 @@
 
   var Callscreen = {
     init: function c_init() {
-      var notificationId = null;
-      var rawParams = window.location.search.slice(1);
-      var params = rawParams.split('&');
-      for (var i = 0; i < params.length; i++) {
-        if (params[i].indexOf('notificationid=') !== -1) {
-          notificationId = params[i].replace('notificationid=', '');
-        }
-      }
+      var notificationId = '';
+      // var notificationId = null;
+      // var rawParams = window.location.search.slice(1);
+      // var params = rawParams.split('&');
+      // for (var i = 0; i < params.length; i++) {
+      //   if (params[i].indexOf('notificationid=') !== -1) {
+      //     notificationId = params[i].replace('notificationid=', '');
+      //   }
+      // }
 
-      if (!notificationId) {
-        window.close();
-      }
+      // if (!notificationId) {
+      //   window.close();
+      // }
 
       var _onSuccess = function() {
         UI.init();

@@ -56,6 +56,7 @@
      */
     signUp: function signUp(msisdnSignUp, onsuccess, onerror) {
       var onSuccess = function() {
+        PushNotification.onNotification('');
         UI.shareUrl(this.shareUrl);
         UI.logOut(this.logOut);
         _callback(onsuccess);
@@ -111,6 +112,7 @@
      */
     signIn: function signIn(onsuccess, onerror) {
       var onSuccess = function() {
+        PushNotification.onNotification('');
         UI.shareUrl(this.shareUrl);
         UI.logOut(this.logOut);
         _callback(onsuccess);

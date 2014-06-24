@@ -90,11 +90,24 @@
           _callback(onerror, [new Error('Unable to get call data')])
           return;
         }
+        console.log(JSON.stringify(call));
         this.session = this.joinCall(
           call, target, constraints, onconnected, onstream, onerror
         );
       };
 
+      if (notificationId === '') {
+        var call = {
+           apiKey: '44835892',
+           sessionId: '1_MX40NDgzNTg5Mn5-VHVlIEp1biAyNCAwMjoyMzoxNSBQRFQgMjAxNH4wLjg5OTg1MzR-UH4',
+           sessionToken: 'T1==cGFydG5lcl9pZD00NDgzNTg5MiZzaWc9NDE4OThiZGUxYmY1MmZmZTM5NzY2Yjg2Njk5ZDZhYWM2NmFkMTI3MDpzZXNzaW9uX2lkPTFfTVg0ME5EZ3pOVGc1TW41LVZIVmxJRXAxYmlBeU5DQXdNam95TXpveE5TQlFSRlFnTWpBeE5INHdMamc1T1RnMU16Ui1VSDQmY3JlYXRlX3RpbWU9MTQwMzYwMTc5NiZub25jZT0wLjE5NDkwODE1MzAzMjg4NCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDAzNjg4MTk2'
+        };
+
+        this.session = this.joinCall(
+          call, target, constraints, onconnected, onstream, onerror
+        );
+        return;
+      }
       ClientRequestHelper.getCalls(
         notificationId,
         onGetCallsSuccess.bind(this),
