@@ -1,7 +1,7 @@
 /* -*- Mode: js; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- /
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 
-/* global ClientRequestHelper, Opentok, Utils */
+/* global ClientRequestHelper, Opentok, Utils, CallProgressHelper */
 
 /* exported CallHelper */
 
@@ -125,11 +125,16 @@
      * @param {Function} onstream Function to be called once the session object
      *                            receives 'streamCreated' events.
      * @param {Function} onerror Function to be called if any error happens.
+     * @param {Bool} outgoing Flag that tells us it is an outgoing call.
      */
     joinCall: function ch_joinCall(
       call, target, constraints,
       onconnected, ondisconnected,
-      onstream, onerror) {
+      onstream, onerror, outgoing) {
+
+      var caller = outgoing ? true : false;
+      var callProgressHelper =
+        new CallProgressHelper(call.callId, call.websocketToken);
 
       Opentok.setConstraints(constraints);
       var session = TB.initSession(call.apiKey, call.sessionId);
@@ -138,17 +143,6 @@
         // Fired when a new peer is connected to the session.
         connectionCreated: function(event) {
           _peersInSession += 1;
-          if (_peersInSession === 1) {
-            // Lets wait 10 second until we hang up the call when no answer from
-            // the called party.
-            window.setTimeout(function onTimeout() {
-              if (_peersInSession > 1) {
-                return;
-              }
-              that.hangUp();
-              _callback(ondisconnected);
-            }, 10000);
-          }
         },
         // Fired when an existing peer is disconnected from the session.
         connectionDestroyed: function(event) {
@@ -170,21 +164,53 @@
           _publishersInSession -= 1;
         }
       });
-      session.connect(call.sessionToken, function(e) {
-        if (e) {
-          Utils.log('Session connect error ' + e.message);
-          _callback(onerror, [e]);
-          return;
+
+      callProgressHelper.onstatechange = function onStateChange(evt) {
+        Utils.log('CallProgressHelper.onstatechange ' + JSON.stringify(evt));
+
+        switch(evt.state) {
+          case 'alerting':
+            if (caller) {
+              return;
+            }
+            callProgressHelper.accept();
+            break;
+          case 'connecting':
+            session.connect(call.sessionToken, function(e) {
+              if (e) {
+                Utils.log('Session connect error ' + e.message);
+                _callback(onerror, [e]);
+                return;
+              }
+              session.publish(target, null, function onPublish(ee) {
+                if (ee) {
+                  Utils.log('Session publish error ' + ee.message);
+                  _callback(onerror, [ee]);
+                }
+               callProgressHelper.mediaUp();
+                _publishersInSession += 1;
+              });
+            });
+            break;
+          case 'connected':
+            _callback(onconnected);
+            break;
+          case 'terminated':
+            that.hangUp();
+            // TODO Should we provide the reason to the UI.
+            _callback(ondisconnected);
+            break;
+          default:
         }
-        _callback(onconnected);
-        session.publish(target, null, function onPublish(ee) {
-          if (ee) {
-            Utils.log('Session publish error ' + ee.message);
-            _callback(onerror, [ee]);
-          }
-          _publishersInSession += 1;
-        });
-      });
+      };
+
+      callProgressHelper.onerror = function onError(evt) {
+        Utils.log('CallProgressHelper.onerror ' + JSON.stringify(evt));
+
+        that.hangUp();
+        _callback(onerror, [new Error(evt.reason)]);
+      };
+
       return session;
     },
 

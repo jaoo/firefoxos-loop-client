@@ -262,7 +262,8 @@
         method: 'POST',
         url: SERVER_URL + '/calls/',
         body: {
-          calleeId: calleeId
+          calleeId: calleeId,
+          callType: 'audio-video'
         },
         credentials: _hawkCredentials
       }, onsuccess, onerror);

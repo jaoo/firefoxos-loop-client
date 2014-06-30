@@ -67,7 +67,6 @@
         } else {
           FxacHelper.logout();
         }
-
         var credentials = {};
         if (msisdnSignUp) {
           credentials.type = '';
@@ -129,12 +128,12 @@
     shareUrl: function c_shareUrl(id, onsuccess, onerror) {
       CallHelper.generateCallUrl(id,
         function onCallUrlSuccess(result) {
-          Utils.log('Loop web URL ' + result.call_url);
+          Utils.log('Loop web URL ' + result.callUrl);
           var activity = new MozActivity({
             name: 'share',
             data: {
               type: 'url',
-              url: result.call_url
+              url: result.callUrl
             }
           });
           activity.onsuccess = onsuccess;
@@ -146,21 +145,21 @@
     },
 
     callUser: function c_callUser(calleeId, onsuccess, onerror) {
-      CallHelper.callUser(calleeId,
-        function onCallUserSuccess(result) {
-          Utils.log('Call user result ' + JSON.stringify(result));
-          _callback(onsuccess);
-        },
-        onerror
-      );
+      var host = document.location.host;
+      var protocol = document.location.protocol;
+      var urlBase = protocol + '//' + host +
+                    '/test_app/callscreen.html?calleeId=' + calleeId;
+      window.open(urlBase, 'call_screen', 'attention');
+      _callback(onsuccess);
     },
 
     /**
      * Log the user out. It clears the app account.
      */
-    logOut: function logOut() {
-      AccountHelper.logOut();
-      onlogout();
+    logOut: function logOut(onlogout) {
+      AccountHelper.logOut(function() {
+        _callback(onlogout);
+      });
     }
   };
 

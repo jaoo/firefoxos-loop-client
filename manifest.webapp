@@ -16,10 +16,11 @@
     "audio-channel-telephony":{},
     "audio-channel-ringer":{},
     "speaker-control": {},
-    "camera":{}
+    "camera":{},
+    "priv-firefox-accounts": {}
   },
   "messages": [
-     { "push": "/sketch_loop/index.html" }
+     { "push": "/test_app/test.html" }
   ],
   "activities": {
     "webrtc-call": {
