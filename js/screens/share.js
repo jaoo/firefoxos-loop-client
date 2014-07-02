@@ -75,6 +75,8 @@
     },
     hide: function s_hide() {
       _sharePanel.classList.remove('show');
+      _contact = null;
+      _url = null;
     }
   };
 

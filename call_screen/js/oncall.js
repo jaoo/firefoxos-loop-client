@@ -9,8 +9,13 @@ window.onload = function() {
   var _speakerManager;
   var _isVideoEnabled;
 
-  // Notification via ringer channel
-  Ringer.play();
+
+  // Cache UI elements
+  var hangoutButton = document.getElementById('hang-out');
+  var answerAudioButton = document.getElementById('answer');
+  var answerVideoButton = document.getElementById('answer-video');
+  var settingsButton = document.getElementById('call-settings');
+
 
   // Enable communications with Controller
   ControllerCommunications.init();
@@ -22,13 +27,6 @@ window.onload = function() {
     var keyValue = urlParams[i].split('=');
     call[keyValue[0]] = decodeURIComponent(keyValue[1]);
   }
-
-  // Cache UI elements
-  var hangoutButton = document.getElementById('hang-out');
-  var answerAudioButton = document.getElementById('answer');
-  var answerVideoButton = document.getElementById('answer-video');
-  var settingsButton = document.getElementById('call-settings');
-  
 
   function _toggleLocalVideo(enable) {
     if (!_speakerManager) {
@@ -55,12 +53,20 @@ window.onload = function() {
   function _setCallState(state) {
     switch(state) {
       case 'incoming':
+        Ringer.play();
+        answerAudioButton.style.display = 'block';
+        answerVideoButton.style.display = 'block';
         // Show 'answer' with video/audio & 'hangout'
         break;
       case 'outgoing':
+        answerAudioButton.style.display = 'none';
+        answerVideoButton.style.display = 'none';
+        _joinCall(true);
         // Show 'hangout' & 'settings'
         break;
       case 'connected':
+        answerAudioButton.style.display = 'none';
+        answerVideoButton.style.display = 'none';
         // Show 'hangout' & 'settings'
         break;
       case 'disconnected':
@@ -74,6 +80,9 @@ window.onload = function() {
         break;
     }
   }
+
+  // Render the right layout
+  _setCallState(call.layout);
 
   // TODO Implement all options in Settings. Currently
   // we have just the video on/off
@@ -90,6 +99,7 @@ window.onload = function() {
   hangoutButton.addEventListener(
     'click',
     function hangOutClick() {
+      window.close();
       Ringer.stop();
       Countdown.stop();
       if (session) {
@@ -116,15 +126,14 @@ window.onload = function() {
   // We have 2 buttons for answering a call, depending on if we are
   // publishing video or not
   function _answer(isVideo) {
-    answerAudioButton.style.display = 'none';
-    answerVideoButton.style.display = 'none';
+    Ringer.stop();
+    _setCallState('connected');
     _joinCall(isVideo);
   }
 
   answerAudioButton.addEventListener(
     'click',
     function answerClick() {
-      Ringer.stop();
       _answer(false);
     }
   );
@@ -132,7 +141,6 @@ window.onload = function() {
   answerVideoButton.addEventListener(
     'click',
     function answerVideo() {
-      Ringer.stop();
       _answer(true);
     }
   );

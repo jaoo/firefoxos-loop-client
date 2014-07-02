@@ -13,6 +13,7 @@
 'use strict';
 
 (function(exports) {
+  var debug = true;
   var SERVER_URL = Config.server_url;
   var TIMEOUT = 15000;
 
@@ -75,6 +76,7 @@
       req.setRequestHeader('authorization', authorization);
     }
     req.onload = function() {
+      debug && console.log(req.status + ': ' + req.response);
       _updateClockOffset(req.getResponseHeader('Date'));
 
       // We may fail because of clock skew issues. In that cases we retry once
@@ -189,7 +191,10 @@
     getCallUrl: function getCallUrl(token, onsuccess, onerror) {
       _request({
         method: 'GET',
-        url: SERVER_URL + '/calls/' + token
+        url: SERVER_URL + '/calls/' + token,
+        body: {
+          callType: "audio-video"
+        }
       }, onsuccess, onerror);
     },
 
