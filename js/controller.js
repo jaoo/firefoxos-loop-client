@@ -166,7 +166,7 @@
 
     logout: function() {
       AccountHelper.logout();
-    },
+    }
 
   };
 
