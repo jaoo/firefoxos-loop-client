@@ -77,12 +77,12 @@
       _callee = _call.layout === 'incoming' ? true : false;
       // TODO: Send busy as reason in case we are in another webrtc call.
       _reason = _callee ?  'reject' : 'cancel';
-      _callProgressHelper = new CallProgressHelper(_call.callId,
-                                                   _call.progressURL,
-                                                   _call.websocketToken);
-      _callProgressHelper.onerror = function onError(evt) {
-        _handleCallProgress(_callProgressHelper);
-      };
+      // _callProgressHelper = new CallProgressHelper(_call.callId,
+      //                                              _call.progressURL,
+      //                                              _call.websocketToken);
+      // _callProgressHelper.onerror = function onError(evt) {
+      //   _handleCallProgress(_callProgressHelper);
+      // };
       return {
         identities: identities,
         layout: layout,
@@ -174,17 +174,39 @@
         }
       });
 
-      _handleCallProgress(_callProgressHelper);
-      _callProgressHelper.onstatechange = function onStateChange(evt) {
-        _handleCallProgress(_callProgressHelper);
-      };
+      // _handleCallProgress(_callProgressHelper);
+      // _callProgressHelper.onstatechange = function onStateChange(evt) {
+      //   _handleCallProgress(_callProgressHelper);
+      // };
+
+      _session.connect(_call.sessionToken, function(e) {
+	if (e) {
+	  console.log('Session connect error ' + e.message);
+	  return;
+	}
+	_publisher = _session.publish(
+	  'local-video', null, function onPublish(ee) {
+	    if (ee) {
+	      console.log('Session publish error ' + ee.message);
+	    }
+	    var container =  document.querySelector('.OT_publisher');
+	    if (!container) {
+	      return;
+	    }
+	    callProgressHelper.mediaUp();
+	    _publishersInSession += 1;
+
+	    container.style.width = '140%';
+	    container.querySelector('video').style.width = '140% !important';
+	});
+      });
     },
 
     stop: function() {
-      if ((_callProgressHelper.state !== 'connected') ||
-          (_callProgressHelper.state !== 'closed')) {
-        _callProgressHelper.terminate(_reason);
-      }
+      // if ((_callProgressHelper.state !== 'connected') ||
+      //     (_callProgressHelper.state !== 'closed')) {
+      //   _callProgressHelper.terminate(_reason);
+      // }
       try {
         _session.disconnect();
       } catch(e) {
@@ -220,7 +242,7 @@
       
       // Clean the call
       _call = {};
-      _callProgressHelper.finish();
+      // _callProgressHelper.finish();
       _callProgressHelper = null;
     }
   };
