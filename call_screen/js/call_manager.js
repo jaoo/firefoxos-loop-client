@@ -69,6 +69,9 @@
         _call[keyValue[0]] = decodeURIComponent(keyValue[1]);
       }
 
+      _call.apiKey = '44632522';
+      _call.sessionId = '2_MX40NDYzMjUyMn5-TW9uIEp1bCAyMSAwNjozNToxMiBQRFQgMjAxNH4wLjU4ODk0MzY2fn4';
+      _call.sessionToken = 'T1==cGFydG5lcl9pZD00NDYzMjUyMiZzaWc9Njg4Mjc3OWU3MDNmYWRjOGM4NzNhZDUyN2QxMGVkNDc4NmJjOTA4NTpyb2xlPXB1Ymxpc2hlciZzZXNzaW9uX2lkPTJfTVg0ME5EWXpNalV5TW41LVRXOXVJRXAxYkNBeU1TQXdOam96TlRveE1pQlFSRlFnTWpBeE5INHdMalU0T0RrME16WTJmbjQmY3JlYXRlX3RpbWU9MTQwNTk0OTcyNyZub25jZT0wLjM2ODI2OTQ4MDQ1MjY2OTUmZXhwaXJlX3RpbWU9MTQwODU0MTA1MA==';
 
       var identities = _call.identities;
       var layout = _call.layout;
