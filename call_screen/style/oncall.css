@@ -696,7 +696,8 @@ body[data-call-status='hold'] #call-settings-video,
 body[data-call-status='hold'] #call-settings-mute,
 body[data-call-status='hold'] #answer,
 body[data-call-status='hold'] #answer-video,
-body[data-call-status='hold'] #local-video  {
+body[data-call-status='hold'] #local-video,
+body[data-call-status='hold'] .local-bubble-shadow {
   display: none;
 }
 

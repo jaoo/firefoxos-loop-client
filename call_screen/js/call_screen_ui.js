@@ -26,7 +26,6 @@
 
       _initialized = true;
 
-
       TonePlayerHelper.init('telephony');
 
       isVideoCall && CallScreenUI.updateLocalVideo(isVideoCall);
@@ -67,8 +66,9 @@
       _hangupButton.addEventListener(
         'mousedown',
         function hangOutClick(e) {
-          Ringer.stop();
           TonePlayerHelper.stop();
+          TonePlayerHelper.releaseResources();
+          Ringer.stop();
           Countdown.stop();
           CallManager.stop();
         }
@@ -177,6 +177,14 @@
       // call manager helper.
       CallManager.onhold = this.toggleHold;
      
+      // Set the callback function to be called once the peer has set its call
+      // on hold.
+      CallManager.onpeeronhold = this.notifyCallHeld;
+
+      // Set the callback function to be called once the peer has resumed the
+      // held call.
+      CallManager.onpeerresume = this.notifyCallResume;
+
       
       // Use status bar in the call screen
       window.onresize = function() {
@@ -301,6 +309,15 @@
         console.log('Fake video was removed before');
       }
       _fakeLocalVideo = null;
+    },
+    notifyCallHeld: function() {
+      TonePlayerHelper.playHold();
+      CallScreenUI.setCallStatus('hold');
+      _resumeButton.style.display = 'none';
+    },
+    notifyCallResume: function() {
+      TonePlayerHelper.stop();
+      CallScreenUI.setCallStatus('connected');
     }
   };
 
