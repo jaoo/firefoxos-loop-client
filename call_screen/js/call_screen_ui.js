@@ -312,8 +312,7 @@
     },
     notifyCallHeld: function() {
       TonePlayerHelper.playHold();
-      CallScreenUI.setCallStatus('hold');
-      _resumeButton.style.display = 'none';
+      CallScreenUI.setCallStatus('remotehold');
     },
     notifyCallResume: function() {
       TonePlayerHelper.stop();
