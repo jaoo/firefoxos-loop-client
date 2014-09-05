@@ -11,6 +11,7 @@
   var _callProgressHelper = null;
   var _callee;
   var _speakerManager;
+  var _forceSpeaker = false;
   var _onhold = function noop() {};
   var _onpeeronhold = function noop() {};
   var _onpeerresume = function noop() {};
@@ -151,7 +152,6 @@
       if (_call) {
         return;
       }
-      _speakerManager = new window.MozSpeakerManager();
 
       AudioCompetingHelper.init();
       _call = params.call;
@@ -183,7 +183,14 @@
     },
 
     toggleSpeaker: function(isSpeakerOn) {
-      _speakerManager.forcespeaker = isSpeakerOn;
+      _forceSpeaker = isSpeakerOn;
+    },
+
+    ensureToggleSpeaker: function() {
+      if (!_speakerManager) {
+        _speakerManager = new window.MozSpeakerManager();
+      }
+      _speakerManager.forcespeaker = _forceSpeaker;
     },
 
     toggleMic: function(isMicOn) {

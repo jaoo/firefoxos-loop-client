@@ -14,6 +14,8 @@
   var BUSY_TONE = '../../resources/media/tones/busy.mp3';
   var HOLD_TONE = '../../resources/media/tones/hold.mp3';
 
+  var _onplaying = function noop() {};
+
   function _playTone(src) {
     _audioElement.src = src;
     _audioElement.loop = true;
@@ -43,6 +45,11 @@
         return;
       }
       _audioElement = new Audio(_channel);
+      _audioElement.addEventListener('playing', _onplaying);
+    },
+
+    set onplaying(onplaying) {
+      _onplaying = onplaying;
     },
 
     playDialing: function tph_playDialing() {

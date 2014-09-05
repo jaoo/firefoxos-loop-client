@@ -36,7 +36,7 @@
       _initialized = true;
 
       TonePlayerHelper.init('telephony');
-
+      TonePlayerHelper.onplaying = CallManager.ensureToggleSpeaker;
       
       var mode = frontCamera ? 'user':'environment';
       var cameraConstraint = {facingMode: mode, require: ['facingMode']};
