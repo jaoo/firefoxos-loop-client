@@ -44,7 +44,8 @@
       if (_audioElement || !_channel) {
         return;
       }
-      _audioElement = new Audio(_channel);
+      _audioElement = new Audio();
+      _audioElement.mozAudioChannelType = _channel;
       _audioElement.addEventListener('playing', _onplaying);
     },
 
