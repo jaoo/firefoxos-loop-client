@@ -272,6 +272,15 @@
           _subscriber.on({
             loaded: function() {
               CallScreenUI.setCallStatus('connected');
+              var videoContainer = document.getElementById('fullscreen-video');
+              var fullScreenVideo = videoContainer.querySelector('video');
+              if (!fullScreenVideo) {
+                return;
+              }
+              fullScreenVideo.addEventListener(
+                'playing',
+                CallManager.ensureToggleSpeaker
+              );
             }
           });
           _publishersInSession += 1;
@@ -333,6 +342,10 @@
             container.querySelector('video').addEventListener('canplay', function() {
               CallScreenUI.removeFakeVideo();
             });
+            container.querySelector('video').addEventListener(
+              'playing',
+              CallManager.ensureToggleSpeaker
+            );
             _publishersInSession += 1;
         });
       });
