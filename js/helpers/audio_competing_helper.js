@@ -41,12 +41,12 @@
         return;
       }
 
-      _silenceBufferSource = _ac.createBufferSource();
-      _silenceBufferSource.buffer = _ac.createBuffer(1, 2048, _ac.sampleRate);
-      _silenceBufferSource.connect(_ac.destination);
-      _silenceBufferSource.loop = true;
+      // _silenceBufferSource = _ac.createBufferSource();
+      // _silenceBufferSource.buffer = _ac.createBuffer(1, 2048, _ac.sampleRate);
+      // _silenceBufferSource.connect(_ac.destination);
+      // _silenceBufferSource.loop = true;
 
-      _silenceBufferSource.start(0);
+      // _silenceBufferSource.start(0);
     },
 
     /**
@@ -57,7 +57,7 @@
       if (!_silenceBufferSource) {
         return;
       }
-      _silenceBufferSource.stop(0);
+      // _silenceBufferSource.stop(0);
 
       this.clearListeners(listener);
     },
